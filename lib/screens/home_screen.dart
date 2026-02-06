@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/glass_card.dart';
+import '../providers/app_providers.dart';
+import '../data/models/app_models.dart';
 import 'camera_screen.dart';
 import 'chat_screen.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authStateProvider).value;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('AgriAI ASSISTANT'),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_outlined)),
+          IconButton(
+            onPressed: () => ref.read(authServiceProvider).signOut(),
+            icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+          ),
           IconButton(onPressed: () {}, icon: const Icon(Icons.person_outline)),
         ],
       ),
@@ -34,6 +42,14 @@ class HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 FadeInDown(
+                  child: Text(
+                    "Hello, ${user?.email?.split('@')[0] ?? 'Farmer'}",
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                FadeInDown(
+                  delay: const Duration(milliseconds: 100),
                   child: const WeatherWidget(),
                 ),
                 const SizedBox(height: 25),
@@ -198,28 +214,52 @@ class TipsCarousel extends StatelessWidget {
   }
 }
 
-class RecentScansList extends StatelessWidget {
+class RecentScansList extends ConsumerWidget {
   const RecentScansList({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: List.generate(3, (index) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: GlassCard(
-          opacity: 0.08,
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(width: 50, height: 50, color: Colors.white10, child: const Icon(Icons.image)),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final historyAsync = ref.watch(scanHistoryProvider);
+
+    return historyAsync.when(
+      data: (history) {
+        if (history.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Text("No scans yet. Start by scanning a leaf!", 
+                style: TextStyle(color: Colors.white.withOpacity(0.5))),
             ),
-            title: Text(index == 0 ? "Rice Blast Detected" : "Tomato Healthy"),
-            subtitle: Text("Scanned on Feb 05, 2026"),
-            trailing: const Icon(Icons.chevron_right, color: Colors.white30),
-          ),
-        ),
-      )),
+          );
+        }
+        return Column(
+          children: history.take(5).map((scan) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: GlassCard(
+              opacity: 0.08,
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    width: 50, 
+                    height: 50, 
+                    color: Colors.white10, 
+                    child: scan.imageUrl != null 
+                        ? Image.network(scan.imageUrl!, fit: BoxFit.cover)
+                        : const Icon(Icons.image)
+                  ),
+                ),
+                title: Text(scan.disease),
+                subtitle: Text("Scanned on ${DateFormat('MMM dd, yyyy').format(scan.timestamp)}"),
+                trailing: const Icon(Icons.chevron_right, color: Colors.white30),
+              ),
+            ),
+          )).toList(),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text("Error loading history: $e")),
     );
   }
 }
