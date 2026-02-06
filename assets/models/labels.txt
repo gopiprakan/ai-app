@@ -1,0 +1,14 @@
+Rice - Brown Spot
+Rice - Leaf Blast
+Rice - Healthy
+Tomato - Bacterial Spot
+Tomato - Early Blight
+Tomato - Late Blight
+Tomato - Healthy
+Chili - Leaf Curl
+Chili - Cercospora Leaf Spot
+Chili - Healthy
+Cotton - Bacterial Blight
+Cotton - Leaf Curl
+Cotton - Healthy
+Unknown - Potentially Diseased
