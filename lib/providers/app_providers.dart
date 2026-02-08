@@ -4,11 +4,13 @@ import '../data/services/ml_service.dart';
 import '../data/services/gemini_service.dart';
 import '../data/services/auth_service.dart';
 import '../data/services/firestore_service.dart';
+import '../data/services/notification_service.dart';
 import '../data/models/app_models.dart';
 import 'dart:typed_data';
 
 final authServiceProvider = Provider((ref) => AuthService());
 final firestoreServiceProvider = Provider((ref) => FirestoreService());
+final notificationServiceProvider = Provider((ref) => NotificationService());
 
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authServiceProvider).authStateChanges;

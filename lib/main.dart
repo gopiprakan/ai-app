@@ -20,9 +20,21 @@ void main() async {
 
   runApp(
     const ProviderScope(
-      child: AgriAIApp(),
+      child: AgriAIAppInitializer(),
     ),
   );
+}
+
+class AgriAIAppInitializer extends ConsumerWidget {
+  const AgriAIAppInitializer({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Initialize notifications
+    ref.read(notificationServiceProvider).initialize();
+    
+    return const AgriAIApp();
+  }
 }
 
 class AgriAIApp extends ConsumerWidget {

@@ -48,4 +48,6 @@ class DefaultFirebaseOptions {
     projectId: 'YOUR_PROJECT_ID',
     storageBucket: 'YOUR_STORAGE_BUCKET',
   );
+
+  static const String vapidKey = 'BFSzqljin6OOdFktWWaEpW-78rBv3AaW6jddtE-nMGorPbL_UUcVilNhMEcUpbUoMpUV33UMBF16U3cRxQ9lSPY';
 }
